@@ -1,0 +1,8 @@
+
+
+pub const SCREEN_SIZE: i32 =  800;
+
+
+pub const HERBIVORE_SIZE: f64 = 30.0;
+
+pub const HERBIVORE_UPPER_BOUND: f64 = SCREEN_SIZE as f64 - HERBIVORE_SIZE;
