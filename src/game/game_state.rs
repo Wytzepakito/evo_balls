@@ -39,20 +39,11 @@ pub fn create_gamestate(n_herbivores: usize, n_plants: usize) -> GameState {
 
 pub fn create_herbivore() -> Herbivore {
     let mut rng = rand::thread_rng();
-    let x = rng.gen_range(0.0..800.0) as f64;
-    let y = rng.gen_range(0.0..800.0) as f64;
-    let direction = match rng.gen_range(0..7) {
-        0 => Direction::North,
-        1 => Direction::NorthWest,
-        2 => Direction::West,
-        3 => Direction::SouthWest,
-        4 => Direction::South,
-        5 => Direction::SouthEast,
-        6 => Direction::East,
-        7 => Direction::NorthEast,
-        _ => unimplemented!(),
-    };
-    Herbivore::new(HERBIVORE_SIZE, RED, x, y, direction, 5000, 0)
+    let x = rng.gen_range(0.0..800.0);
+    let y = rng.gen_range(0.0..800.0);
+    let direction = rng.gen_range(0..360);
+
+    Herbivore::new(HERBIVORE_SIZE, RED, x, y, direction, 5000, 0, 1.0)
 }
 
 pub fn create_plant() -> Plant {

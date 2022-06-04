@@ -1,5 +1,6 @@
 use graphics::types::ColorComponent;
-use rand::prelude::SliceRandom;
+use rand::{prelude::SliceRandom, Rng};
+use core::f32::consts::PI;
 
 use crate::constants::HERBIVORE_UPPER_BOUND;
 
@@ -20,22 +21,24 @@ pub enum Direction {
 pub struct Herbivore {
     pub size: f64,
     pub color: [ColorComponent; 4],
-    pub x: f64,
-    pub y: f64,
-    pub direction: Direction,
+    pub x: f32,
+    pub y: f32,
+    pub direction: u8,
     pub energy_level: u32,
     pub alive_ticks: u32,
+    pub speed: f32,
 }
 
 impl Herbivore {
     pub fn new(
         size: f64,
         color: [ColorComponent; 4],
-        x: f64,
-        y: f64,
-        direction: Direction,
+        x: f32,
+        y: f32,
+        direction: u8,
         energy_level: u32,
         alive_ticks: u32,
+        speed: f32,
     ) -> Herbivore {
         Herbivore {
             size: size,
@@ -45,16 +48,15 @@ impl Herbivore {
             direction: direction,
             energy_level: energy_level,
             alive_ticks: alive_ticks,
+            speed: speed,
         }
     }
 
     pub fn advance(&mut self) {
-        let mut new_x: f64;
-        let mut new_y: f64;
-        let (new_x_, new_y_) = self.get_move();
 
-        new_x = new_x_;
-        new_y = new_y_;
+        let (new_x, new_y) = self.get_move();
+
+
 
         // In case the new position is out of bounds.
         if new_x > 770.0 || new_x < 0.0 || new_y > 770.0 || new_y < 0.0 {
@@ -71,45 +73,14 @@ impl Herbivore {
         self.energy_level -= 1;
     }
 
-    fn get_move(&mut self) -> (f64, f64) {
-        let mut new_x: f64;
-        let mut new_y: f64;
+    fn get_move(&mut self) -> (f32, f32) {
 
-        match self.direction {
-            Direction::North => {
-                new_x = self.x;
-                new_y = self.y - 1.0;
-            }
-            Direction::NorthWest => {
-                new_x = self.x + 1.0;
-                new_y = self.y - 1.0;
-            }
-            Direction::West => {
-                new_x = self.x + 1.0;
-                new_y = self.y;
-            }
-            Direction::SouthWest => {
-                new_x = self.x + 1.0;
-                new_y = self.y + 1.0;
-            }
-            Direction::South => {
-                new_x = self.x;
-                new_y = self.y + 1.0;
-            }
-            Direction::SouthEast => {
-                new_x = self.x - 1.0;
-                new_y = self.y + 1.0;
-            }
-            Direction::East => {
-                new_x = self.x - 1.0;
-                new_y = self.y;
-            }
-            Direction::NorthEast => {
-                new_x = self.x - 1.0;
-                new_y = self.y - 1.0;
-            }
-            _ => unimplemented!(),
-        }
+
+
+        
+        let new_x: f32 = self.x +  self.speed * f32::cos(self.direction as f32 * ( PI / 180.0 ));
+        let new_y: f32 = self.y + self.speed * f32::sin(self.direction as f32 * ( PI / 180.0 ));
+
         (new_x, new_y)
     }
 
@@ -119,29 +90,30 @@ impl Herbivore {
 
 
 
-    fn get_new_direction(&self, new_x: f64, new_y: f64) -> Direction {
+    fn get_new_direction(&self, new_x: f32, new_y: f32) -> u8 {
+        let mut rng = rand::thread_rng();
         // Upper right corner
         if new_x > HERBIVORE_UPPER_BOUND && new_y > HERBIVORE_UPPER_BOUND {
-            return Direction::NorthEast;
+            return rng.gen_range(0..90);
         } // Lower right corner
         else if ( new_x > HERBIVORE_UPPER_BOUND && new_y  < 0.0) {
-            return Direction::SouthEast;
+            return rng::get_range(90..180);
         } // Lower left corner
         else if ( new_x < 0.0 && new_y > HERBIVORE_UPPER_BOUND) {
-            return Direction::NorthWest;
+            return rng::get_range(270..360);
         } // Upper left corner
         else if ( new_x < 0.0 && new_y > HERBIVORE_UPPER_BOUND) {
-            return Direction::SouthWest;
+            return rng::get_range(180..270);
         }
 
         if (new_x > HERBIVORE_UPPER_BOUND) {
-            return self.choose_east_options();
+            return rng::get_range(0..180);
         } else if (new_x < 0.0) {
-            return self.choose_west_options();
+            return rng::get_range(180..360);
         } else if (new_y > HERBIVORE_UPPER_BOUND) {
             return self.choose_north_options();
         } else  {
-            return self.choose_south_options();
+            return rng::get_range(90..270);
         }
     }
 
